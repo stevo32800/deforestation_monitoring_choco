@@ -38,11 +38,11 @@ def display_image(item, rgb_name, bbox=None):
     blue_pixels  = read_band_pixels(item, rgb_name[2], bbox)
     print(red_pixels.shape, green_pixels.shape, blue_pixels.shape)
 
-    """    # Masquer les nodata (fill value DN=0 -> valeur négative après scaling)
+    # Masquer les nodata (fill value DN=0 -> valeur négative après scaling)
     nodata_mask = (red_pixels < 0) | (green_pixels < 0) | (blue_pixels < 0)
     red_pixels[nodata_mask]   = np.nan
     green_pixels[nodata_mask] = np.nan
-    blue_pixels[nodata_mask]  = np.nan"""
+    blue_pixels[nodata_mask]  = np.nan
 
     def stretch(band):
         """Étirement linéaire percentile 2%-98% pour améliorer le contraste"""
@@ -122,6 +122,12 @@ def display_histogram(item, rgb_name, bbox=None):
     green_pixels = read_band_pixels(item, rgb_name[1], bbox)
     blue_pixels  = read_band_pixels(item, rgb_name[2],  bbox)
 
+    # masquer les nodata (fill value DN=0 -> valeur negative apres scaling)
+    mask = (red_pixels < 0) | (green_pixels < 0) | (blue_pixels < 0)
+    red_pixels = np.where(mask, np.nan, red_pixels)
+    green_pixels = np.where(mask, np.nan, green_pixels)
+    blue_pixels = np.where(mask, np.nan, blue_pixels)
+
     plt.figure(figsize=(12, 5))
     plt.hist(red_pixels.flatten(),   bins=100, color='red',   alpha=0.5, label=f'Red ({rgb_name[0]})',   density=True)
     plt.hist(green_pixels.flatten(), bins=100, color='green', alpha=0.5, label=f'Green ({rgb_name[1]})', density=True)
@@ -133,8 +139,8 @@ def display_histogram(item, rgb_name, bbox=None):
     plt.tight_layout()
     plt.show()
 
-    print(f"Red   — min: {red_pixels.min():.4f} | max: {red_pixels.max():.4f} | mean: {red_pixels.mean():.4f}")
-    print(f"Green — min: {green_pixels.min():.4f} | max: {green_pixels.max():.4f} | mean: {green_pixels.mean():.4f}")
-    print(f"Blue  — min: {blue_pixels.min():.4f} | max: {blue_pixels.max():.4f} | mean: {blue_pixels.mean():.4f}")
+    print(f"Red   — min: {np.nanmin(red_pixels):.4f} | max: {np.nanmax(red_pixels):.4f} | mean: {np.nanmean(red_pixels):.4f}")
+    print(f"Green — min: {np.nanmin(green_pixels):.4f} | max: {np.nanmax(green_pixels):.4f} | mean: {np.nanmean(green_pixels):.4f}")
+    print(f"Blue  — min: {np.nanmin(blue_pixels):.4f} | max: {np.nanmax(blue_pixels):.4f} | mean: {np.nanmean(blue_pixels):.4f}")
 
 
